@@ -27,7 +27,7 @@ For more details or contribution opportunities, please contact the maintainer.
 
 Thank you for your interest and support!
 
-# Mapper Quick Start Guide
+# Quick Start Guide
 
 ## 1. Installation
 
