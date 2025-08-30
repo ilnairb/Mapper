@@ -31,9 +31,7 @@ Thank you for your interest and support!
 
 ## 1. Installation
 
-Install this nuget package to your application.
-
----
+Install this nuget package to your application. Please note that the namespace is **Mapper**.
 
 ## 2. Basic Usage: Mapping Between Classes
 
