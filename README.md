@@ -74,6 +74,15 @@ PersonDto dto = mapper.Map<Person, PersonDto>(person);
 ```csharp
 List<Person> people = GetPeople();
 List<PersonDto> dtos = mapper.Map<List<Person>, List<PersonDto>>(people);
+
+// Map large IEnumerable collection by batch to reduce memory pressure. You can specify the batch size. The default is 1000.
+IEnumerable<Address> src = new List<Address>
+{
+	new Address { Name = "King", Number = 2, Type = "Ave" },
+	new Address { Name = "George", Number = 3, Type = "Road" }
+};
+
+var dto = _mapper.MapBatched<Address, AddressDto>(src).ToList();
 ```
 
 ## 4. Ignore Properties (Optional)
@@ -112,6 +121,8 @@ var projected = people.ProjectTo<PersonDto>(mapper);
 
 This creates an IQueryable<PersonDto> that the database provider can optimize. IOrderedQueryable is supported as well.
 
+User can use ProjectToProfiling and ProjectToListProfiling to analyse the performance of the projection and execution of a query. Slow projection/execution will be logged to MappingDiagnostics. See MapperOptions for thresholds. 
+
 ## 6. Diagnostics (Optional)
 
 After mapping, you can access mapping diagnostics and warnings:
@@ -123,6 +134,7 @@ foreach (var warning in diagnostics.Warnings)
     Console.WriteLine(warning);
 }
 ```
+Additional diagnostics will be collected if MessageOptions.EnableDiagnosticsLogging is true.
 
 ## 7. Auto Mapping Configuration
 
@@ -207,7 +219,19 @@ public class MappingProfile : IProfile
 
 ```csharp
 services.AddMapper(Assembly.GetExecutingAssembly());
+
+// or with MapperOptions
+
+services.AddMapper(options=>
+{
+	options.EnableDiagnosticsLogging = false;
+	options.BatchSize = 1000;
+	options.SlowMappingThresholdMs = 5;
+	options.SlowProjectionThresholdMs = 100;
+}, Assembly.GetExecutingAssembly());
 ```
+
+MapperOptions can be accessed later via the IMapper interface.
 
 The mapper will automatically scan the assembly, find all implementations of IProfile, and run their Configure method.
 By doing this, **all mappings are registered and cached at startup, ensuring efficient mapping during runtime**.
